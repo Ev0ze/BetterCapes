@@ -10,6 +10,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,11 +21,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-public class CapeCommand implements CommandExecutor {
+public class CapeCommand implements CommandExecutor, TabCompleter {
     private static final String PROFILE_URL = "https://api.mojang.com/users/profiles/minecraft/";
     private static final String SKIN_URL = "https://sessionserver.mojang.com/session/minecraft/profile/%s?unsigned=false";
     private static final Map<String, Collection<ProfileProperty>> cache = new HashMap<>();
@@ -44,11 +47,26 @@ public class CapeCommand implements CommandExecutor {
             return true;
         }
         if (args.length == 0) {
-            player.sendMessage("§cUsage: /cape <player>");
+            player.sendMessage("§cUsage: /cape <capeName>");
             return true;
         }
 
-        String targetCapePlayer = args[0];
+        // First, check if the argument matches a cape key in the config.
+        String input = args[0];
+        FileConfiguration config = plugin.getConfig();
+        String targetCapePlayer;
+        if (config.contains("Capes." + input)) {
+            targetCapePlayer = config.getString("Capes." + input);
+            if (targetCapePlayer == null || targetCapePlayer.isEmpty()) {
+                player.sendMessage("§cCape " + input + " has no owner configured!");
+                return true;
+            }
+        } else {
+            // Fallback: assume the input is a player name
+            targetCapePlayer = input;
+        }
+
+        // Retrieve the player's profile and get the cape texture from the target
         PlayerProfile playerProfile = player.getPlayerProfile();
         Collection<ProfileProperty> properties = getCapeTextureProperty(targetCapePlayer);
         if (properties.isEmpty()) {
@@ -157,5 +175,22 @@ public class CapeCommand implements CommandExecutor {
                 otherPlayer.showPlayer(plugin, player);
             }
         });
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        List<String> completions = new ArrayList<>();
+        if (args.length == 1) {
+            FileConfiguration config = plugin.getConfig();
+            if (config.contains("Capes")) {
+                String partial = args[0].toLowerCase();
+                config.getConfigurationSection("Capes").getKeys(false).forEach(capeName -> {
+                    if (capeName.toLowerCase().startsWith(partial)) {
+                        completions.add(capeName);
+                    }
+                });
+            }
+        }
+        return completions;
     }
 }
