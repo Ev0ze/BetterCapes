@@ -1,0 +1,7 @@
+name: skin-changer
+version: '1.0-SNAPSHOT'
+main: io.smcode.skinChanger.SkinChangerPlugin
+api-version: '1.21'
+commands:
+  nick:
+  cape:
