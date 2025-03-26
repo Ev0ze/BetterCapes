@@ -1,6 +1,6 @@
-name: skin-changer
-version: '1.0-SNAPSHOT'
-main: io.smcode.skinChanger.SkinChangerPlugin
+name: EvCapes
+version: '1.2-SNAPSHOT'
+main: dev.Ev0ze.EvCapes.Main
 api-version: '1.21'
 commands:
   nick:

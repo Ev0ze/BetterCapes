@@ -95,11 +95,5 @@
             <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.bukkit/craftbukkit -->
-        <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>craftbukkit</artifactId>
-            <version>1.21-R2</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 </project>
