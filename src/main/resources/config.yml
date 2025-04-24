@@ -1,7 +1,5 @@
-Capes:
-  Minecon2011: "Mark"
-  Minecon2012: "8"
-  Minecon2013: "Stormsx4"
-  Minecon2015: "Zenection"
-  Mojang: "Jeb_"
-  Ev0ze: "Ev0ze"
+# BetterCapes Configuration
+# This plugin allows players to steal skins and capes from other players
+# Commands:
+# /identity <player> - Change your skin and name to match another player
+# /stealcape <player> - Steal a cape from another player (if they have one)

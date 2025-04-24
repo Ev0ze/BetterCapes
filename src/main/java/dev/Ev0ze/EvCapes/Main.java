@@ -8,12 +8,12 @@ public final class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Register the /nick command as before.
-        this.getCommand("nick").setExecutor(new SkinCommand());
-        // Register the updated /cape command.
+        // Register the /identity command (formerly /nick)
+        this.getCommand("identity").setExecutor(new SkinCommand());
+        // Register the /stealcape command (formerly /cape)
         CapeCommand capeCmd = new CapeCommand(this);
-        this.getCommand("cape").setExecutor(capeCmd);
-        this.getCommand("cape").setTabCompleter(capeCmd);
+        this.getCommand("stealcape").setExecutor(capeCmd);
+        this.getCommand("stealcape").setTabCompleter(capeCmd);
         // Save the default config (if not present)
         saveDefaultConfig();
     }

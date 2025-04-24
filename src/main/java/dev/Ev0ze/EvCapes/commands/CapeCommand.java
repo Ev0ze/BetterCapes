@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.codec.binary.Base64;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -47,23 +48,17 @@ public class CapeCommand implements CommandExecutor, TabCompleter {
             return true;
         }
         if (args.length == 0) {
-            player.sendMessage("§cUsage: /cape <capeName>");
+            player.sendMessage("§cUsage: /stealcape <playerName>");
             return true;
         }
 
-        // First, check if the argument matches a cape key in the config.
-        String input = args[0];
-        FileConfiguration config = plugin.getConfig();
-        String targetCapePlayer;
-        if (config.contains("Capes." + input)) {
-            targetCapePlayer = config.getString("Capes." + input);
-            if (targetCapePlayer == null || targetCapePlayer.isEmpty()) {
-                player.sendMessage("§cCape " + input + " has no owner configured!");
-                return true;
-            }
-        } else {
-            // Fallback: assume the input is a player name
-            targetCapePlayer = input;
+        // Get the target player name
+        String targetCapePlayer = args[0];
+
+        // Check if the target player exists and has a cape
+        if (!playerHasCape(targetCapePlayer)) {
+            player.sendMessage("§cPlayer " + targetCapePlayer + " does not exist or does not have a cape.");
+            return true;
         }
 
         // Retrieve the player's profile and get the cape texture from the target
@@ -106,10 +101,10 @@ public class CapeCommand implements CommandExecutor, TabCompleter {
             playerProfile.setProperty(new ProfileProperty("textures", encodedString,
                     playerProfile.getProperties().iterator().next().getSignature()));
             player.setPlayerProfile(playerProfile);
-            player.sendMessage("§aYour cape has been changed!");
+            player.sendMessage("§aYou have successfully stolen " + targetCapePlayer + "'s cape!");
             updateSkin(player);
         } else {
-            player.sendMessage("§cPlayer " + targetCapePlayer + " does not have a cape.");
+            player.sendMessage("§cFailed to steal cape: Player " + targetCapePlayer + " does not have a cape.");
         }
         return true;
     }
@@ -134,6 +129,27 @@ public class CapeCommand implements CommandExecutor, TabCompleter {
         ProfileProperty profileProperty = new ProfileProperty("textures", value, signature);
         cache.put(targetCapePlayer, List.of(profileProperty));
         return List.of(profileProperty);
+    }
+
+    /**
+     * Checks if a player has a cape
+     *
+     * @param playerName The name of the player to check
+     * @return true if the player has a cape, false otherwise
+     */
+    private boolean playerHasCape(String playerName) {
+        Collection<ProfileProperty> properties = getCapeTextureProperty(playerName);
+        if (properties.isEmpty()) {
+            return false;
+        }
+
+        String capeValue = properties.iterator().next().getValue();
+        byte[] decodedCapeBytes = Base64.decodeBase64(capeValue);
+        String decodedCapeString = new String(decodedCapeBytes);
+        JsonObject capeJson = JsonParser.parseString(decodedCapeString).getAsJsonObject();
+        JsonObject capeTextures = capeJson.getAsJsonObject("textures");
+
+        return capeTextures.has("CAPE");
     }
 
     private String makeRequest(String url) {
@@ -179,18 +195,7 @@ public class CapeCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        List<String> completions = new ArrayList<>();
-        if (args.length == 1) {
-            FileConfiguration config = plugin.getConfig();
-            if (config.contains("Capes")) {
-                String partial = args[0].toLowerCase();
-                config.getConfigurationSection("Capes").getKeys(false).forEach(capeName -> {
-                    if (capeName.toLowerCase().startsWith(partial)) {
-                        completions.add(capeName);
-                    }
-                });
-            }
-        }
-        return completions;
+        // No tab completions for player names
+        return new ArrayList<>();
     }
 }

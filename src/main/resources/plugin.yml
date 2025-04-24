@@ -3,5 +3,5 @@ version: '1.2-SNAPSHOT'
 main: dev.Ev0ze.EvCapes.Main
 api-version: '1.21'
 commands:
-  nick:
-  cape:
+  identity:
+  stealcape:
