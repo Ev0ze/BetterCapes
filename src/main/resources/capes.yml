@@ -8,93 +8,93 @@
 
 capes:
   # Minecraft Official Capes
-  minecon_2011:
+  minecon_2011: # correct
     name: "Minecon 2011"
     url: "http://textures.minecraft.net/texture/953cac8b779fe41383e675ee2b86071a71658f2180f56fbce8aa315ea70e2ed6"
     enabled: true
 
-  minecon_2012:
+  minecon_2012: # correct
     name: "Minecon 2012"
     url: "http://textures.minecraft.net/texture/a2e8d97ec79100e90a75d369d1b3ba81273c4f82bc1b737e934eed4a854be1b6"
     enabled: true
 
-  minecon_2013:
+  minecon_2013: # correct
     name: "Minecon 2013"
     url: "http://textures.minecraft.net/texture/153b1a0dfcbae953cdeb6f2c2bf6bf79943239b1372780da44bcbb29273131da"
     enabled: true
 
-  minecon_2015:
+  minecon_2015: # correct
     name: "Minecon 2015"
     url: "http://textures.minecraft.net/texture/b0cc08840700447322d953a02b965f1d65a13a603bf64b17c803c21446fe1635"
     enabled: true
 
-  minecon_2016:
+  minecon_2016: # correct
     name: "Minecon 2016"
     url: "http://textures.minecraft.net/texture/e7dfea16dc83c97df01a12fabbd1216359c0cd0ea42f9999b6e97c584963e980"
     enabled: true
 
-  mojang_classic:
+  mojang_classic: # INCORRECT
     name: "Mojang Classic"
-    url: "http://textures.minecraft.net/texture/8f120319222a9f4a11620b3529a5fd4d32b3fb8c0b15b9132c869f9dd106a403"
+    url: "http://textures.minecraft.net/texture/8f120319222a9f4a104e2f5cb97b2cda93199a2ee9e1585cb8d09d6f687cb761"
     enabled: true
 
-  mojang_studios:
+  mojang_studios: # correct
     name: "Mojang Studios"
-    url: "http://textures.minecraft.net/texture/5786fe99be377dfb6858859f926c4dbc995751e91cee373468c5fbf4865e7151"
+    url: "http://textures.minecraft.net/texture/9e507afc56359978a3eb3e32367042b853cddd0995d17d0da995662913fb00f7"
     enabled: true
 
-  translator:
+  translator: # correct
     name: "Translator"
     url: "http://textures.minecraft.net/texture/1bf91499701404e21bd46b0191d63239a4ef76ebde88d27e4d430ac211df681e"
     enabled: true
 
-  migrator:
-    name: "Migrator"
-    url: "http://textures.minecraft.net/texture/2340c0e03dd24a11b15a8b33c2a7e9e32abb2051b2481d0d0e2e00a3b0b4e4"
-    enabled: true
-
-  cobalt:
+  cobalt: # correct
     name: "Cobalt"
     url: "http://textures.minecraft.net/texture/ca35c56efe71ed290385f4ab5346a1826b546a54d519e6a3ff01efa01acce81"
     enabled: true
 
-  scrolls:
+  scrolls: # correct
     name: "Scrolls"
     url: "http://textures.minecraft.net/texture/3efadf6510961830f9fcc077f19b4daf286d502b5f5aafbd807c7bbffcaca245"
     enabled: true
 
-  mojira_mod:
+  mojira_mod: # correct
     name: "Mojira Moderator"
     url: "http://textures.minecraft.net/texture/ae677f7d98ac70a533713518416df4452fe5700365c09cf45d0d156ea9396551"
     enabled: true
 
-  realms_mapmaker:
+  realms_mapmaker: # Correct
     name: "Realms Mapmaker"
     url: "http://textures.minecraft.net/texture/17912790ff164b93196f08ba71d0e62129304776d0f347334f8a6eae509f8a56"
     enabled: true
 
-  mojang_10th:
-    name: "Mojang 10th Anniversary"
-    url: "http://textures.minecraft.net/texture/9e507afc56359978a3eb3e32367042b853cddd0995d17d0da995662913fb00f7"
-    enabled: true
-
-  birthday:
+  birthday: # correct
     name: "Minecraft Birthday"
     url: "http://textures.minecraft.net/texture/2056f2eebd759cce93460907186ef44e9192954ae12b227d817eb4b55627a7fc"
     enabled: true
 
-  millionth:
+  millionth: # correct
     name: "Millionth Customer"
-    url: "http://textures.minecraft.net/texture/70f9971c0a7c28b5b212bc8537884c67e2bd9a7e9af8a46c434bc8174f5d1d0a"
+    url: "https://textures.minecraft.net/texture/70efffaf86fe5bc089608d3cb297d3e276b9eb7a8f9f2fe6659c23a2d8b18edf"
     enabled: true
 
-  prismarine:
+  prismarine: # correct
     name: "Prismarine"
-    url: "http://textures.minecraft.net/texture/d8f8d13a1adf9636a16c7f990eb26dabb1c4155e5b39446a68aea67e8ac0eb0"
+    url: "https://textures.minecraft.net/texture/d8f8d13a1adf9636a16c31d47f3ecc9bb8d8533108aa5ad2a01b13b1a0c55eac"
     enabled: true
 
-  turtle:
+  turtle: # correct
     name: "Turtle"
     url: "http://textures.minecraft.net/texture/5048ea61566353397247d2b7d946034de926b997d5e66c86483dfb1e031aee95"
+    enabled: true
+
+  Minecraft Experience: # correct
+    name: "Minecraft Experience"
+    url: "https://textures.minecraft.net/texture/7658c5025c77cfac7574aab3af94a46a8886e3b7722a895255fbf22ab8652434"
+    enabled: true
+
+  dB: # correct
+    name: "dB"
+    url: "https://textures.minecraft.net/texture/bcfbe84c6542a4a5c213c1cacf8979b5e913dcb4ad783a8b80e3c4a7d5c8bdac"
     enabled: true
 
