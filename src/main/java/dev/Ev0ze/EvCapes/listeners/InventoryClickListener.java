@@ -21,13 +21,13 @@ public class InventoryClickListener implements Listener {
         }
 
         // Check if the inventory is our cape selection GUI
-        if (event.getView().getTitle().equals(ChatColor.DARK_PURPLE + "Cape Selection")) {
+        if (event.getView().getTitle().startsWith(ChatColor.DARK_PURPLE + "Cape Selection")) {
             event.setCancelled(true); // Prevent taking items from the GUI
-            
+
             if (event.getCurrentItem() == null) {
                 return;
             }
-            
+
             // Handle the click in the CapesCommand class
             capesCommand.handleInventoryClick(player, event.getRawSlot());
         }

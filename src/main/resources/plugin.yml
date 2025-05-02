@@ -2,7 +2,11 @@ name: EvCapes
 version: '1.2-SNAPSHOT'
 main: dev.Ev0ze.EvCapes.Main
 api-version: '1.21'
+description: 'A plugin that allows players to equip custom capes'
 commands:
   identity:
-  stealcape:
+    description: Change your skin to match another player
+    usage: /identity <player>
   capes:
+    description: Open the cape selection GUI
+    usage: /capes

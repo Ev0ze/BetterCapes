@@ -2,7 +2,7 @@ package dev.Ev0ze.EvCapes.commands;
 
 import dev.Ev0ze.EvCapes.Main;
 import dev.Ev0ze.EvCapes.models.CapeData;
-import dev.Ev0ze.EvCapes.utils.CapeManager;
+import dev.Ev0ze.EvCapes.utils.ConfigCapeManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -28,8 +28,12 @@ import java.util.UUID;
 
 public class CapesCommand implements CommandExecutor {
     private final Plugin plugin;
-    private final CapeManager capeManager;
+    private final ConfigCapeManager capeManager;
     private final Map<UUID, CapeData> selectedCapes = new HashMap<>();
+    private final Map<UUID, Integer> playerPages = new HashMap<>();
+
+    // Number of capes per page (2 rows of 9)
+    private static final int CAPES_PER_PAGE = 18;
 
     public CapesCommand(Plugin plugin) {
         this.plugin = plugin;
@@ -45,11 +49,7 @@ public class CapesCommand implements CommandExecutor {
         }
 
         // Store the player's original cape when they first open the GUI
-        // Only store if we haven't already stored it
-        if (!capeManager.hasOriginalCape(player)) {
-            capeManager.storeOriginalCape(player);
-            Bukkit.getLogger().info("Stored original cape for player " + player.getName());
-        }
+        capeManager.storeOriginalCape(player);
 
         // Open the cape selection GUI
         openCapesGUI(player);
@@ -61,28 +61,69 @@ public class CapesCommand implements CommandExecutor {
      * @param player The player to open the GUI for
      */
     private void openCapesGUI(Player player) {
+        openCapesGUI(player, 0);
+    }
+
+    /**
+     * Opens the cape selection GUI for a player at a specific page
+     * @param player The player to open the GUI for
+     * @param page The page number (0-based)
+     */
+    private void openCapesGUI(Player player, int page) {
+        // Store the player's current page
+        playerPages.put(player.getUniqueId(), page);
+
         // Create a new inventory with 27 slots (3 rows)
-        Inventory gui = Bukkit.createInventory(player, 27, ChatColor.DARK_PURPLE + "Cape Selection");
+        Inventory gui = Bukkit.createInventory(player, 27, ChatColor.DARK_PURPLE + "Cape Selection - Page " + (page + 1));
 
         // Get the available capes from the CapeManager
         List<CapeData> availableCapes = capeManager.getAvailableCapes();
 
-        // Fill the top 2 rows with white banners for each cape
+        // Calculate the total number of pages
+        int totalPages = (int) Math.ceil((double) availableCapes.size() / CAPES_PER_PAGE);
+
+        // Calculate the start and end indices for the current page
+        int startIndex = page * CAPES_PER_PAGE;
+        int endIndex = Math.min(startIndex + CAPES_PER_PAGE, availableCapes.size());
+
+        // Fill the top 2 rows with white banners for each cape on the current page
         int slot = 0;
-        for (int i = 0; i < Math.min(availableCapes.size(), 18); i++) {
+        for (int i = startIndex; i < endIndex; i++) {
             CapeData cape = availableCapes.get(i);
             ItemStack banner = createBanner(cape, player);
             gui.setItem(slot, banner);
             slot++;
         }
 
-        // Add the reset button at the bottom middle slot (slot 22)
+        // Add navigation buttons in the bottom row
+
+        // Previous page button (red candle) - only if not on the first page
+        if (page > 0) {
+            ItemStack prevButton = new ItemStack(Material.RED_CANDLE);
+            ItemMeta prevMeta = prevButton.getItemMeta();
+            prevMeta.setDisplayName(ChatColor.RED + "Previous Page");
+            prevMeta.setLore(Arrays.asList(ChatColor.GRAY + "Click to go to page " + page));
+            prevButton.setItemMeta(prevMeta);
+            gui.setItem(18, prevButton);
+        }
+
+        // Reset button at the bottom middle slot (slot 22)
         ItemStack resetButton = new ItemStack(Material.RED_STAINED_GLASS_PANE);
         ItemMeta resetMeta = resetButton.getItemMeta();
         resetMeta.setDisplayName(ChatColor.RED + "Reset Cape");
         resetMeta.setLore(Arrays.asList(ChatColor.GRAY + "Click to reset to your original cape"));
         resetButton.setItemMeta(resetMeta);
         gui.setItem(22, resetButton);
+
+        // Next page button (green candle) - only if not on the last page
+        if (page < totalPages - 1) {
+            ItemStack nextButton = new ItemStack(Material.GREEN_CANDLE);
+            ItemMeta nextMeta = nextButton.getItemMeta();
+            nextMeta.setDisplayName(ChatColor.GREEN + "Next Page");
+            nextMeta.setLore(Arrays.asList(ChatColor.GRAY + "Click to go to page " + (page + 2)));
+            nextButton.setItemMeta(nextMeta);
+            gui.setItem(26, nextButton);
+        }
 
         // Open the GUI for the player
         player.openInventory(gui);
@@ -100,7 +141,8 @@ public class CapesCommand implements CommandExecutor {
         meta.setDisplayName(ChatColor.GOLD + cape.getAlias() + " Cape");
 
         List<String> lore = new ArrayList<>();
-        lore.add(ChatColor.GRAY + "Player with cape: " + ChatColor.YELLOW + cape.getPlayerWithCape());
+        // Add the cape URL to the lore
+        lore.add(ChatColor.GRAY + "URL: " + ChatColor.YELLOW + cape.getUrl());
 
         // Check if the player has permission for this cape
         String permissionNode = "evcapes.cape." + cape.getAlias().toLowerCase().replace(" ", "");
@@ -137,61 +179,82 @@ public class CapesCommand implements CommandExecutor {
      * @param slot The slot that was clicked
      */
     public void handleInventoryClick(Player player, int slot) {
+        // Get the current page for this player
+        int currentPage = playerPages.getOrDefault(player.getUniqueId(), 0);
+
         // Get the available capes from the CapeManager
         List<CapeData> availableCapes = capeManager.getAvailableCapes();
 
-        // Check if the click was on a cape banner (slots 0-17)
-        if (slot >= 0 && slot < 18 && slot < availableCapes.size()) {
-            CapeData selectedCape = availableCapes.get(slot);
-            String playerWithCape = selectedCape.getPlayerWithCape();
+        // Calculate the total number of pages
+        int totalPages = (int) Math.ceil((double) availableCapes.size() / CAPES_PER_PAGE);
 
-            // Check if the player has permission for this cape
-            String permissionNode = "evcapes.cape." + selectedCape.getAlias().toLowerCase().replace(" ", "");
-            if (!player.hasPermission(permissionNode) && !player.hasPermission("evcapes.cape.*")) {
-                player.sendMessage(ChatColor.RED + "You don't have permission to use the " +
-                                  ChatColor.GOLD + selectedCape.getAlias() + ChatColor.RED + " cape!");
-                player.sendMessage(ChatColor.RED + "Required permission: " + permissionNode);
-
-                // Reopen the GUI
-                openCapesGUI(player);
-                return;
-            }
-
-            // Store the selected cape
-            selectedCapes.put(player.getUniqueId(), selectedCape);
-
-            // Try to apply the cape directly by URL first
-            boolean success = false;
-            if (selectedCape.getUrl() != null && !selectedCape.getUrl().isEmpty()) {
-                success = capeManager.applyCapeByUrl(player, selectedCape.getUrl());
-                if (success) {
-                    player.sendMessage(ChatColor.GREEN + "Successfully applied the " + ChatColor.GOLD + selectedCape.getAlias() +
-                                      ChatColor.GREEN + " cape using direct URL!");
-                }
-            }
-
-            // If direct URL method failed, try the player method as fallback
-            if (!success) {
-                if (capeManager.applyCape(player, playerWithCape)) {
-                    player.sendMessage(ChatColor.GREEN + "Successfully applied the " + ChatColor.GOLD + selectedCape.getAlias() +
-                                       ChatColor.GREEN + " cape from player " + ChatColor.YELLOW + playerWithCape + "!");
-                } else {
-                    player.sendMessage(ChatColor.RED + "Failed to apply the " + ChatColor.GOLD + selectedCape.getAlias() +
-                                      ChatColor.RED + " cape. The player " + ChatColor.YELLOW + playerWithCape +
-                                      ChatColor.RED + " may not have a cape or does not exist.");
-                }
-            }
-
-            // Reopen the GUI to show the selection
-            openCapesGUI(player);
+        // Check if the click was on the previous page button (slot 18)
+        if (slot == 18 && currentPage > 0) {
+            // Go to the previous page
+            openCapesGUI(player, currentPage - 1);
+            return;
         }
+
+        // Check if the click was on the next page button (slot 26)
+        if (slot == 26 && currentPage < totalPages - 1) {
+            // Go to the next page
+            openCapesGUI(player, currentPage + 1);
+            return;
+        }
+
+        // Check if the click was on a cape banner (slots 0-17)
+        if (slot >= 0 && slot < 18) {
+            // Calculate the actual index in the capes list
+            int capeIndex = currentPage * CAPES_PER_PAGE + slot;
+
+            // Make sure the index is valid
+            if (capeIndex < availableCapes.size()) {
+                CapeData selectedCape = availableCapes.get(capeIndex);
+                String playerWithCape = selectedCape.getPlayerWithCape();
+
+                // Check if the player has permission for this cape
+                String permissionNode = "evcapes.cape." + selectedCape.getAlias().toLowerCase().replace(" ", "");
+                if (!player.hasPermission(permissionNode) && !player.hasPermission("evcapes.cape.*")) {
+                    player.sendMessage(ChatColor.RED + "You don't have permission to use the " +
+                                      ChatColor.GOLD + selectedCape.getAlias() + ChatColor.RED + " cape!");
+                    player.sendMessage(ChatColor.RED + "Required permission: " + permissionNode);
+
+                    // Reopen the GUI on the same page
+                    openCapesGUI(player, currentPage);
+                    return;
+                }
+
+                // Store the selected cape
+                selectedCapes.put(player.getUniqueId(), selectedCape);
+
+                // Try to apply the cape directly by URL first
+                boolean success = false;
+                if (selectedCape.getUrl() != null && !selectedCape.getUrl().isEmpty()) {
+                    success = capeManager.applyCapeByUrl(player, selectedCape.getUrl());
+                    if (success) {
+                        player.sendMessage(ChatColor.GREEN + "Successfully applied the " + ChatColor.GOLD + selectedCape.getAlias() +
+                                          ChatColor.GREEN + " cape using direct URL!");
+                    }
+                }
+
+                // If direct URL method failed, show error message
+                if (!success) {
+                    player.sendMessage(ChatColor.RED + "Failed to apply the " + ChatColor.GOLD + selectedCape.getAlias() +
+                                      ChatColor.RED + " cape. Please contact an administrator.");
+                }
+
+                // Reopen the GUI to show the selection on the same page
+                openCapesGUI(player, currentPage);
+            }
+        }
+
         // Check if the click was on the reset button (slot 22)
-        else if (slot == 22) {
-            if (capeManager.resetCape(player)) {
-                player.sendMessage(ChatColor.GREEN + "Your cape has been reset to your original cape!");
+        if (slot == 22) {
+            if (capeManager.removeCape(player)) {
+                player.sendMessage(ChatColor.GREEN + "Your cape has been removed!");
                 selectedCapes.remove(player.getUniqueId());
             } else {
-                player.sendMessage(ChatColor.RED + "Failed to reset your cape. You may not have had an original cape stored.");
+                player.sendMessage(ChatColor.RED + "Failed to remove your cape.");
             }
             player.closeInventory();
         }
