@@ -5,3 +5,4 @@ api-version: '1.21'
 commands:
   identity:
   stealcape:
+  capes:

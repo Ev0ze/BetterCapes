@@ -3,3 +3,4 @@
 # Commands:
 # /identity <player> - Change your skin and name to match another player
 # /stealcape <player> - Steal a cape from another player (if they have one)
+# /capes - Open a GUI to select and apply different Minecraft capes
