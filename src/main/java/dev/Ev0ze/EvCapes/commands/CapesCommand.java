@@ -250,11 +250,11 @@ public class CapesCommand implements CommandExecutor {
 
         // Check if the click was on the reset button (slot 22)
         if (slot == 22) {
-            if (capeManager.removeCape(player)) {
-                player.sendMessage(ChatColor.GREEN + "Your cape has been removed!");
+            if (capeManager.resetCape(player)) {
+                player.sendMessage(ChatColor.GREEN + "Your cape has been reset to the original state!");
                 selectedCapes.remove(player.getUniqueId());
             } else {
-                player.sendMessage(ChatColor.RED + "Failed to remove your cape.");
+                player.sendMessage(ChatColor.RED + "Failed to reset your cape.");
             }
             player.closeInventory();
         }

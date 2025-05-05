@@ -98,3 +98,7 @@ capes:
     url: "https://textures.minecraft.net/texture/bcfbe84c6542a4a5c213c1cacf8979b5e913dcb4ad783a8b80e3c4a7d5c8bdac"
     enabled: true
 
+  test: # correct
+    name: "API Test"
+    url: "https://laby.net/api/v3/texture/c7091e237e7562e73990a97dda5bc554/cape.png?download=1"
+    enabled: true
